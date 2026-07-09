@@ -6,6 +6,11 @@ const int IN2 = 6;
 const int IN3 = 9;
 const int IN4 = 10;
 
+// --- PWM GESCHWINDIGKEITEN FÜR GERADEAUSLAUF ---
+// Passe diese beiden Werte an, bis der Roboter geradeaus fährt!
+const int SPEED_LINKS = 180;  // Geschwindigkeit linker Motor (IN1/IN2)
+const int SPEED_RECHTS = 195; // Geschwindigkeit rechter Motor (IN3/IN4)
+
 // Pins für den HC-SR04 Ultraschallsensor
 const int TRIG_PIN = 11;
 const int ECHO_PIN = 12;
@@ -34,17 +39,15 @@ void setup() {
   // Servo initialisieren und nach vorne ausrichten (90 Grad)
   meinServo.attach(SERVO_PIN);
   meinServo.write(90);
-  delay(500); // Kurz warten, bis der Servo die Position erreicht hat
+  delay(500);
 }
 
 void loop() {
   distanz = messeDistanz();
 
-  // Wenn der Weg frei ist (mehr als 20 cm Platz)
   if (distanz > 20) {
     vorwaerts();
   } 
-  // Wenn ein Hindernis im Weg ist
   else {
     stopp();
     delay(200);
@@ -53,24 +56,21 @@ void loop() {
     stopp();
     delay(200);
 
-    // Umgebung scannen
     umgebungScannen();
 
-    // Entscheiden, wohin die Fahrt geht
     if (distanzRechts >= distanzLinks) {
       dreheRechts();
-      delay(200); // Zeit für die Drehung (evtl. anpassen)
+      delay(200);
     } else {
       dreheLinks();
-      delay(200); // Zeit für die Drehung (evtl. anpassen)
+      delay(200);
     }
     stopp();
     delay(200);
   }
-  delay(50); // Kleine Pause zur Stabilisierung
+  delay(50);
 }
 
-// Funktion zur Distanzmessung (Ultraschall)
 int messeDistanz() {
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
@@ -81,62 +81,57 @@ int messeDistanz() {
   dauer = pulseIn(ECHO_PIN, HIGH);
   int cm = dauer * 0.034 / 2;
   
-  if (cm == 0) cm = 250; // Fehlerwert abfangen
+  if (cm == 0) cm = 250;
   return cm;
 }
 
-// Servo blickt nach links und rechts und misst die Werte
 void umgebungScannen() {
-  // Nach rechts schauen
   meinServo.write(20);
   delay(500);
   distanzRechts = messeDistanz();
   
-  // Nach links schauen
   meinServo.write(160);
   delay(500);
   distanzLinks = messeDistanz();
   
-  // Wieder geradeaus schauen
   meinServo.write(90);
   delay(500);
 }
 
-// --- Bewegungsfunktionen für die Motoren ---
+// --- Bewegungsfunktionen mit getrennter PWM-Steuerung ---
 
 void vorwaerts() {
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  analogWrite(IN1, SPEED_LINKS);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, SPEED_RECHTS);
+  analogWrite(IN4, 0);
 }
 
 void rueckwaerts() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  analogWrite(IN1, 0);
+  analogWrite(IN2, SPEED_LINKS);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, SPEED_RECHTS);
 }
 
 void dreheLinks() {
-  // Linkes Rad rückwärts, rechtes Rad vorwärts
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  // Beim Drehen auf der Stelle nutzen wir die jeweiligen Werte
+  analogWrite(IN1, 0);
+  analogWrite(IN2, SPEED_LINKS);
+  analogWrite(IN3, SPEED_RECHTS);
+  analogWrite(IN4, 0);
 }
 
 void dreheRechts() {
-  // Linkes Rad vorwärts, rechtes Rad rückwärts
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  analogWrite(IN1, SPEED_LINKS);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, SPEED_RECHTS);
 }
 
 void stopp() {
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
+  analogWrite(IN1, 0);
+  analogWrite(IN2, 0);
+  analogWrite(IN3, 0);
+  analogWrite(IN4, 0);
 }
