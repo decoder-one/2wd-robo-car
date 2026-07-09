@@ -6,7 +6,7 @@ https://www.roboter-bausatz.de/p/bausatz-2wd-roboter-smart-car-arduino-kit
 other kits see www
 
 parts:
-UNO R3 board
+UNO R3 board,
 2 wheels with tires,
 2 gear motors,
 4 motor cables,
