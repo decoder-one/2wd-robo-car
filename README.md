@@ -1,5 +1,5 @@
 # 2wd-robo-car
-2 dc motors, arduino uno with shield 5.0, L298N dual full-bridge driver , servo an ultrasonic sensor
+2 dc motors, arduino uno with shield 5.0, L298N dual full-bridge driver , servo and ultrasonic sensor
 
 complete set:
 https://www.roboter-bausatz.de/p/bausatz-2wd-roboter-smart-car-arduino-kit
